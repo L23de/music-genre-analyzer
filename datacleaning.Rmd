@@ -1,2 +1,23 @@
------
------
+---
+title: "Music Data Processing"
+author: "Lester Huang"
+date: "10/28/2022"
+output: html_notebook
+---
+
+Load in CSV
+```{r}
+music <- read.csv("music_data.csv", header=TRUE)
+
+# Remove the default 'X' column name for the song "index"
+colnames(music)[1] <- ''
+```
+
+Remove Attributes
+```{r}
+music$artist_name <- NULL
+music$track_name <- NULL
+music$lyrics <- NULL
+```
+
+
