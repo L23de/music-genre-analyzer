@@ -20,4 +20,27 @@ music$track_name <- NULL
 music$lyrics <- NULL
 ```
 
+Normalize
+```{r}
+```
+
+Split
+```{r}
+# The data comes in sorted so we need to scramble the dataset to make effective and balanced splits
+df = df[sample(1:nrow(df)),]
+
+# Calculate how many rows to include in testing
+split_prop = round(0.8 * nrow(df))
+
+# Create train and test
+train = df[1:(split_prop-1),]
+test = df[split_prop:nrow(df),]
+```
+
+Save
+```{r}
+# Write to CSVs
+write.csv(train, "./train.csv", row.names = TRUE)
+write.csv(test, "./test.csv", row.names = TRUE)
+```
 
