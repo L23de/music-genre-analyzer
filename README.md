@@ -20,9 +20,9 @@ Because the lyrics were originally collected by an external API and parsed using
 
 ## Data Bio
 
-- Brief: Our dataset comes from data.mendeley.com and is a comprehensive “list of lyrics from 1950 to 2019 describing music metadata as different attributes” collected from Echo Nest API and analyzed using Python’s spotify library
-- Size: 28372 samples
+-   Brief: Our dataset comes from data.mendeley.com and is a comprehensive “list of lyrics from 1950 to 2019 describing music metadata as different attributes” collected from Echo Nest API and analyzed using Python’s spotify library
+-   Size: 28372 samples
     A- ttributes/topics (30): [artist name, track name, release date, lyrics, len, dating, violence, world life, night time, shake the audience, family gospel, romantic, communication, obscene, music, movement places, light visual perceptions, family spiritual, like girls, sadness, feelings, danceability, loudness, acousticness, instrumentalness, valence energy, topic, age]
-- Target Variable, Genre (7): [pop, country, blues, jazz, reggae, rock, and hip hop]
-- Source: https://data.mendeley.com/datasets/3t9vbwxgr5/2
-- Explanation: Vista do Temporal Analysis and Visualisation of Music (sbc.org.br)
+-   Target Variable, Genre (7): [pop, country, blues, jazz, reggae, rock, and hip hop]
+-   Source: [Music Dataset: Lyrics and Metadata from 1950 to 2019](https://data.mendeley.com/datasets/3t9vbwxgr5/2)
+-   Explanation: [Vista do Temporal Analysis and Visualisation of Music](https://sol.sbc.org.br/index.php/eniac/article/view/12155/12020)
