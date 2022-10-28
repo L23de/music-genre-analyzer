@@ -5,7 +5,7 @@ date: "10/28/2022"
 output: html_notebook
 ---
 
-Load in CSV
+# Load in CSV
 ```{r}
 music <- read.csv("music_data.csv", header=TRUE)
 
@@ -13,18 +13,23 @@ music <- read.csv("music_data.csv", header=TRUE)
 colnames(music)[1] <- ''
 ```
 
-Remove Attributes
+# Data Cleaning
+
+## Remove Attributes
+Attributes that does not mean too much or is difficult to process
 ```{r}
 music$artist_name <- NULL
 music$track_name <- NULL
 music$lyrics <- NULL
 ```
 
-Normalize
+## Normalize using standard scaler
+All columns get normalized to its mean and unit variance
 ```{r}
 ```
 
-Split
+# Train-test Split
+K-Fold Cross Validation will be used later on the train to create a train and validation set
 ```{r}
 # The data comes in sorted so we need to scramble the dataset to make effective and balanced splits
 music = music[sample(1:nrow(music)),]
@@ -37,7 +42,7 @@ train = music[1:(split_prop-1),]
 test = music[split_prop:nrow(music),]
 ```
 
-Save
+Save to file
 ```{r}
 # Write to CSVs
 write.csv(train, "./train.csv", row.names = TRUE)
