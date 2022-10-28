@@ -1,6 +1,6 @@
 ---
 title: "Music Data Processing"
-author: "Lester Huang"
+author: "Eric Osterman, Ethan Lavi, Emma Closter, Gabrielle Effendi, Lester Huang"
 date: "10/28/2022"
 output: html_notebook
 ---
@@ -43,4 +43,3 @@ Save
 write.csv(train, "./train.csv", row.names = TRUE)
 write.csv(test, "./test.csv", row.names = TRUE)
 ```
-
