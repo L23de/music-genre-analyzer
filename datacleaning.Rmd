@@ -26,6 +26,23 @@ music$lyrics <- NULL
 ## Normalize using standard scaler
 All columns get normalized to its mean and unit variance
 ```{r}
+# scale's every column except release_date, genre & topic
+# uses the cleaned data and makes X column NULL
+
+music <- read.csv(file = 'downloads/tcc_ceds_music.csv', header = TRUE)
+music$X <- NULL
+music$artist_name <- NULL
+music$track_name <- NULL
+music$lyrics <- NULL
+
+
+for(i in 1:ncol(music)){
+  if(!is.element(colnames(music)[i], c("release_date", "genre", "topic"))){
+   m = mean(music[,i])
+  standard_dev = sd(music[,i])
+  music[,i ] = ((music[,i]-m)/standard_dev) 
+  }
+}
 ```
 
 # Train-test Split
