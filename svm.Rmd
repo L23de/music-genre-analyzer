@@ -1,0 +1,26 @@
+Load the data
+```{r}
+train = read.csv("./train.csv", header=TRUE)
+```
+
+
+Create the SVM model in a function
+```{r}
+library(e1071)
+
+# Make svm model with different kernel
+svm_model_lin <- svm(formula=genre~., kernel="linear", data=train, type="C-classification")
+svm_model_rad <- svm(formula=genre~., kernel="radial", data=train, type="C-classification")
+svm_model_sig <- svm(formula=genre~., kernel="sigmoid", data=train, type="C-classification")
+svm_model_poly <- svm(formula=genre~., kernel="polynomial", data=train, type="C-classification")
+```
+
+
+Ten Fold Cross Validation
+```{r}
+# Calculate accuracies
+class_predictions <- predict(svm_model, train, type="response")
+correct = sum(class_predictions == train$genre)
+total = length(class_predictions)
+print(paste("Accuracy: ", correct / total))
+```
