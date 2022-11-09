@@ -74,6 +74,8 @@ music$topicIsFeeling <- music$topic == "feelings"
 
 music$topic <- NULL
 
+# Bucket the years
+music$release_date <- as.factor(floor((music$release_date - 1950) / 10))
 ```
 
 # Train-test Split
