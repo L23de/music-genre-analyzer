@@ -5,9 +5,15 @@ date: "10/28/2022"
 output: html_notebook
 ---
 
-# Load in CSV
+# Load libraries
+
 ```{r}
-#Load in CSV
+library(caret)
+```
+
+# Load in CSV
+
+```{r}
 music <- read.csv("music_data.csv", header=TRUE)
 
 # Remove the default 'X' column name for the song "index"
@@ -17,32 +23,56 @@ colnames(music)[1] <- ''
 # Data Cleaning
 
 ## Remove Attributes
+
 Attributes that does not mean too much or is difficult to process
+
 ```{r}
-music$X <- NULL
 music$artist_name <- NULL
 music$track_name <- NULL
 music$lyrics <- NULL
 ```
 
 ## Normalize using standard scaler
+
 All columns get normalized to its mean and unit variance
+
 ```{r}
 # scale's every column except release_date, genre & topic
 # uses the cleaned data and makes X column NULL
-
-
 for(i in 1:ncol(music)){
   if(!is.element(colnames(music)[i], c("release_date", "genre", "topic"))){
    m = mean(music[,i])
   standard_dev = sd(music[,i])
-  music[,i ] = ((music[,i]-m)/standard_dev) 
+  music[,i ] = ((music[,i]-m)/standard_dev)
   }
 }
 ```
 
+# Clean Categorical Variables
+```{r}
+# Genre
+unique(music$genre)
+music$genre <- as.numeric(factor(music$genre))
+
+# Topic
+unique(music$topic)
+music$topicIsSad <- music$topic == "sadness"
+music$topicIsLife <- music$topic == "world/life"
+music$topicIsMusic <- music$topic == "music"
+music$topicIsRomance <- music$topic == "romantic"
+music$topicIsViolence <- music$topic == "violence"
+music$topicIsObscence <- music$topic == "obscene"
+music$topicIsNight <- music$topic <- "night/time"
+music$topicIsFeeling <- music$topic <- "feelings"
+
+music$topic <- NULL
+
+```
+
 # Train-test Split
+
 K-Fold Cross Validation will be used later on the train to create a train and validation set
+
 ```{r}
 # The data comes in sorted so we need to scramble the dataset to make effective and balanced splits
 music = music[sample(1:nrow(music)),]
@@ -56,14 +86,9 @@ test = music[split_prop:nrow(music),]
 ```
 
 Save to file
+
 ```{r}
 # Write to CSVs
 write.csv(train, "./train.csv", row.names = TRUE)
 write.csv(test, "./test.csv", row.names = TRUE)
-```
-
-```{r}
-
-
-
 ```
