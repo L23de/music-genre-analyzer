@@ -83,6 +83,8 @@ split_prop = round(0.8 * nrow(music))
 # Create train and test
 train = music[1:(split_prop-1),]
 test = music[split_prop:nrow(music),]
+colnames(train) <- colnames(music)
+colnames(test) <- colnames(music)
 ```
 
 Save to file
