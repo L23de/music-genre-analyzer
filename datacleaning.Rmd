@@ -5,9 +5,18 @@ date: "10/28/2022"
 output: html_notebook
 ---
 
+# Install dependencies
+```{r}
+install.packages()
+install.packages("caret")
+```
+
+
+
 # Load libraries
 
 ```{r}
+library(ggplot2)
 library(caret)
 ```
 
@@ -15,9 +24,6 @@ library(caret)
 
 ```{r}
 music <- read.csv("music_data.csv", header=TRUE)
-
-# Remove the default 'X' column name for the song "index"
-colnames(music)[1] <- ''
 ```
 
 # Data Cleaning
@@ -27,6 +33,7 @@ colnames(music)[1] <- ''
 Attributes that does not mean too much or is difficult to process
 
 ```{r}
+music$X <- NULL
 music$artist_name <- NULL
 music$track_name <- NULL
 music$lyrics <- NULL
@@ -50,11 +57,11 @@ for(i in 1:ncol(music)){
 
 # Clean Categorical Variables
 ```{r}
-# Genre
+# Convert Genre to Numerical Values
 unique(music$genre)
 music$genre <- as.numeric(factor(music$genre))
 
-# Topic
+# One Hot Encode Topic
 unique(music$topic)
 music$topicIsSad <- music$topic == "sadness"
 music$topicIsLife <- music$topic == "world/life"
@@ -62,8 +69,8 @@ music$topicIsMusic <- music$topic == "music"
 music$topicIsRomance <- music$topic == "romantic"
 music$topicIsViolence <- music$topic == "violence"
 music$topicIsObscence <- music$topic == "obscene"
-music$topicIsNight <- music$topic <- "night/time"
-music$topicIsFeeling <- music$topic <- "feelings"
+music$topicIsNight <- music$topic == "night/time"
+music$topicIsFeeling <- music$topic == "feelings"
 
 music$topic <- NULL
 
