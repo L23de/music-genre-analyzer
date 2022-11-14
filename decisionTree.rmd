@@ -1,1 +1,99 @@
 # Decision Tree
+```
+# Load libraries
+
+```{r}
+library(ggplot2)
+library(caret)
+```
+
+# Load in CSV
+
+```{r}
+music <- read.csv("tcc_ceds_music.csv", header=TRUE)
+```
+
+# Data Cleaning
+
+## Remove Attributes
+
+Attributes that does not mean too much or is difficult to process
+
+```{r}
+music$X <- NULL
+music$artist_name <- NULL
+music$track_name <- NULL
+music$lyrics <- NULL
+```
+
+## Normalize using standard scaler
+
+All columns get normalized to its mean and unit variance
+
+```{r}
+# scale's every column except release_date, genre & topic
+# uses the cleaned data and makes X column NULL
+for(i in 1:ncol(music)){
+  if(!is.element(colnames(music)[i], c("release_date", "genre", "topic"))){
+   m = mean(music[,i])
+  standard_dev = sd(music[,i])
+  music[,i ] = ((music[,i]-m)/standard_dev)
+  }
+}
+```
+
+# Clean Categorical Variables
+```{r}
+# Convert Genre to Numerical Values
+unique(music$genre)
+music$genre <- as.numeric(factor(music$genre))
+
+# One Hot Encode Topic
+unique(music$topic)
+music$topicIsSad <- music$topic == "sadness"
+music$topicIsLife <- music$topic == "world/life"
+music$topicIsMusic <- music$topic == "music"
+music$topicIsRomance <- music$topic == "romantic"
+music$topicIsViolence <- music$topic == "violence"
+music$topicIsObscence <- music$topic == "obscene"
+music$topicIsNight <- music$topic == "night/time"
+music$topicIsFeeling <- music$topic == "feelings"
+
+music$topic <- NULL
+
+# Bucket the years
+music$release_date <- as.factor(floor((music$release_date - 1950) / 10))
+```
+
+# Train-test Split
+
+K-Fold Cross Validation will be used later on the train to create a train and validation set
+
+```{r}
+# The data comes in sorted so we need to scramble the dataset to make effective and balanced splits
+music = music[sample(1:nrow(music)),]
+
+# Calculate how many rows to include in testing
+split_prop = round(0.8 * nrow(music))
+
+# Create train and test
+train = music[1:(split_prop-1),]
+test = music[split_prop:nrow(music),]
+```
+
+# Save to file
+
+```{r}
+# Write to CSVs
+write.csv(train, "./train.csv", row.names = TRUE)
+write.csv(test, "./test.csv", row.names = TRUE)
+```
+
+#Decision Tree
+```{r}
+library(rpart)
+library(partykit)
+decisionTree <- rpart(genre ~ ., data = train , method = "class" )
+summary(decisionTree)
+#plot(decisionTree)
+plot(as.party(decisionTree))
