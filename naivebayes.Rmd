@@ -1,0 +1,11 @@
+---
+title: "Music Data Processing"
+author: "Lester Huang, Eric Osterman, Ethan Lavi, Emma Closter, Gabrielle Effendi"
+date: "11/15/2022"
+output: html_notebook
+---
+
+```{r}
+
+```
+
