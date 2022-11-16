@@ -2,7 +2,7 @@
 # Make function
 predictive_values <- function(actual_val, predicted, verbose){
   # Get classes from values
-  options <- unique(actual_val)
+  options <- sort(unique(actual_val))
   
   # Get length of those values
   class_len <- length(options)
@@ -58,5 +58,5 @@ predictive_values <- function(actual_val, predicted, verbose){
   print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
 }
 
-predictive_values(c(1,2,3,4), c(1,2,3,4), FALSE)
+predictive_values(c(1,2,3,4), c(1,2,3,4), verbose=FALSE)
 ```

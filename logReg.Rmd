@@ -24,7 +24,7 @@ Generate predicitve values
 # Make function
 predictive_values <- function(actual_val, predicted, verbose=FALSE){
   # Get classes from values
-  options <- unique(actual_val)
+  options <- sort(unique(actual_val))
   
   # Get length of those values
   class_len <- length(options)
