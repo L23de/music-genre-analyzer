@@ -7,8 +7,13 @@ library(ggplot2)
 library(caret)
 ```
 
-# Load in CSV
+# Load libraries
+```{r}
+library(ggplot2)
+library(caret)
+```
 
+# Load in CSV
 ```{r}
 music <- read.csv("tcc_ceds_music.csv", header=TRUE)
 ```
@@ -16,9 +21,7 @@ music <- read.csv("tcc_ceds_music.csv", header=TRUE)
 # Data Cleaning
 
 ## Remove Attributes
-
 Attributes that does not mean too much or is difficult to process
-
 ```{r}
 music$X <- NULL
 music$artist_name <- NULL
@@ -27,9 +30,7 @@ music$lyrics <- NULL
 ```
 
 ## Normalize using standard scaler
-
 All columns get normalized to its mean and unit variance
-
 ```{r}
 # scale's every column except release_date, genre & topic
 # uses the cleaned data and makes X column NULL
@@ -66,9 +67,7 @@ music$release_date <- as.factor(floor((music$release_date - 1950) / 10))
 ```
 
 # Train-test Split
-
 K-Fold Cross Validation will be used later on the train to create a train and validation set
-
 ```{r}
 # The data comes in sorted so we need to scramble the dataset to make effective and balanced splits
 music = music[sample(1:nrow(music)),]
@@ -82,14 +81,13 @@ test = music[split_prop:nrow(music),]
 ```
 
 # Save to file
-
 ```{r}
 # Write to CSVs
 write.csv(train, "./train.csv", row.names = TRUE)
 write.csv(test, "./test.csv", row.names = TRUE)
 ```
 
-#Decision Tree
+# Decision Tree
 ```{r}
 library(rpart)
 library(partykit)
@@ -97,3 +95,42 @@ decisionTree <- rpart(genre ~ ., data = train , method = "class" )
 summary(decisionTree)
 #plot(decisionTree)
 plot(as.party(decisionTree))
+
+# Predictions
+vpred <- predict(decisionTree, type = "class")
+#matrix
+tab <- table(pred = vpred, actual = train$genre) 
+tab
+accuracy <- sum(diag(tab))/sum(tab)
+cat("Accuracy:", accuracy)
+```
+
+# C50 Decision Tree
+```{r}
+#prediction
+library(C50)
+train$genre <- as.factor(train$genre)
+treeModel <- C5.0(x = train[-c(2)], y = train$genre)
+summary(treeModel)
+plot(treeModel)
+ruleModel <- C5.0(genre ~ ., data = train, rules = TRUE)
+```
+
+```{r}
+library(C50)
+#training for creating model
+#training$p.2
+train$genre <- NULL 
+modelC5 <- C5.0( x = train[], as.factor(train$genre), method = "class") 
+# x = all attributes, y = factor of what you want to predict
+train$genre <- as.factor(train$genre)
+#modelC5 <- C5.0( p~., data = training, rules = TRUE, method = "class")
+summary(modelC5)
+plot(modelC5)
+#testing data with the trained data create
+vpred <- predict(modelC5, test, type="class")
+tabC5 <- table(data.frame(test$genre, pred = vpred))
+tabC5
+accuracyC5 <- sum(diag(tab))/sum(tab)
+accuracyC5
+```
