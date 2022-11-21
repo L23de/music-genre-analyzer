@@ -1,0 +1,91 @@
+---
+title: "CSE160 final project K-NN model"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+#installing dependencies
+
+
+library(ggplot2)
+library(caret)
+
+music <- read.csv("~/CSE160/music-genre-analyzer/music_data.csv", header=TRUE)
+
+music$X <- NULL
+music$artist_name <- NULL
+music$track_name <- NULL
+music$lyrics <- NULL
+
+# scale's every column except release_date, genre & topic
+# uses the cleaned data and makes X column NULL
+for(i in 1:ncol(music)){
+  if(!is.element(colnames(music)[i], c("release_date", "genre", "topic"))){
+   m = mean(music[,i])
+  standard_dev = sd(music[,i])
+  music[,i ] = ((music[,i]-m)/standard_dev)
+  }
+}
+
+# Convert Genre to Numerical Values
+unique(music$genre)
+music$genre <- as.numeric(factor(music$genre))
+
+# One Hot Encode Topic
+unique(music$topic)
+music$topicIsSad <- music$topic == "sadness"
+music$topicIsLife <- music$topic == "world/life"
+music$topicIsMusic <- music$topic == "music"
+music$topicIsRomance <- music$topic == "romantic"
+music$topicIsViolence <- music$topic == "violence"
+music$topicIsObscence <- music$topic == "obscene"
+music$topicIsNight <- music$topic == "night/time"
+music$topicIsFeeling <- music$topic == "feelings"
+
+music$topic <- NULL
+
+# Bucket the years
+music$release_date <- as.factor(floor((music$release_date - 1950) / 10))
+
+
+# The data comes in sorted so we need to scramble the dataset to make effective and balanced splits
+music = music[sample(1:nrow(music)),]
+
+# Calculate how many rows to include in testing
+split_prop = round(0.8 * nrow(music))
+
+# Create train and test
+train = music[1:(split_prop-1),]
+test = music[split_prop:nrow(music),]
+
+
+#KNN
+library(kknn)
+#distance of 1 has highest
+music.kknn <- kknn(genre ~., train, test, k = 1 ,distance = 1)
+summary(music.kknn)
+
+music.kknn
+
+fit <- fitted(music.kknn)
+
+fit <- ceiling(fit)
+
+tab <- table(test$genre, fit)
+
+# highest accuracy I was able to get using k-nn model
+knn_accuracy <- sum(diag(tab)) / sum(tab)
+knn_accuracy
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
