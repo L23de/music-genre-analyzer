@@ -6,6 +6,83 @@ output: html_notebook
 ---
 
 ```{r}
+library(e1071)
+library(pROC)
+```
+
+
+Load the train and test data
+```{r}
+train = read.csv("./train.csv", header=TRUE)
+test = read.csv("./test.csv", header=TRUE)
+```
+
+Train models and select best based on 10-fold CV
+```{r}
+## Create 10 equally sized folds
+folds <- cut(seq(1, nrow(test)), breaks=10, labels=FALSE)
+alpha <- 1
+
+for (alpha in c(0.1, 1, 10, 100, 1000, 10000)) {
+  
+  aggr_acc <- 0
+  aggr_roc <- 0
+  
+  # Begin 10-fold CV
+  for (i in 1:10) {
+    # Segment data by folds using which()
+    testIndices <- which(folds == i, arr.ind=TRUE)
+    validateSet <- train[testIndices, ]
+    trainSet <- train[-testIndices, ]
+    
+    #  Separate into X and Y vars
+    trainX <- trainSet
+    trainX$genre <- NULL
+    trainY <- as.factor(trainSet$genre)
+    
+    validateX <- validateSet
+    validateX$genre <- NULL
+    validateY <- as.factor(validateSet$genre)
+    
+    # Train Model
+    model <- naiveBayes(trainX, trainY, laplace=alpha)
+    pred <- predict(model, validateX, type="class")
+    
+    models <- append(models, model)
+    
+    conf_matrix <- table(pred, validateY)
+    
+    # Compute metrics
+    aggr_acc <- aggr_acc + sum(diag(conf_matrix))/sum(conf_matrix)
+    aggr_roc <- aggr_roc + multiclass.roc(as.numeric(validateY), as.numeric(pred), quiet=TRUE)$auc
+    
+  }
+  print(paste0("Alpha Value:", alpha))
+  print(paste0("Accuracy:", aggr_acc / 10))
+  print(paste0("Area Under ROC:", aggr_roc / 10))
+  print("")
+}
+```
+
+Predict on Test Values
+```{r}
+# Select model with alpha = 1000, produced best results in training
+testY <- test$genre
+testX <- test
+testX$genre <- NULL
+
+model <- naiveBayes(trainX, trainY, laplace=1000)
+pred <- predict(model, testX)
+
+conf_matrix <- table(pred, testY)
+print(conf_matrix)
+print(paste0("ACC:",sum(diag(conf_matrix))/sum(conf_matrix)))
+print(paste0("ROC:", multiclass.roc(as.numeric(testY), as.numeric(pred), quiet=TRUE)$auc))
+```
+
+
+Plot ROC Curve with manual model analysis
+```{r}
 
 ```
 
