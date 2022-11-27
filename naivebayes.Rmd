@@ -15,13 +15,21 @@ Load the train and test data
 ```{r}
 train = read.csv("./train.csv", header=TRUE)
 test = read.csv("./test.csv", header=TRUE)
+
+# Remove index column
+train$X <- NULL
+test$X <- NULL
+
+source("classPredictions.R")
 ```
 
 Train models and select best based on 10-fold CV
 ```{r}
-## Create 10 equally sized folds
+# Create 10 equally sized folds
 folds <- cut(seq(1, nrow(test)), breaks=10, labels=FALSE)
 alpha <- 1
+index <- 1
+metrics <- data.frame(Alpha=double(), Accuracy=double(), AROC=double())
 
 for (alpha in c(0.1, 1, 10, 100, 1000, 10000)) {
   
@@ -48,20 +56,22 @@ for (alpha in c(0.1, 1, 10, 100, 1000, 10000)) {
     model <- naiveBayes(trainX, trainY, laplace=alpha)
     pred <- predict(model, validateX, type="class")
     
-    models <- append(models, model)
-    
     conf_matrix <- table(pred, validateY)
     
     # Compute metrics
+    acc <- sum(diag(conf_matrix))/sum(conf_matrix)
+    roc <- multiclass.roc(as.numeric(validateY), as.numeric(pred), quiet=TRUE)$auc
+    
     aggr_acc <- aggr_acc + sum(diag(conf_matrix))/sum(conf_matrix)
     aggr_roc <- aggr_roc + multiclass.roc(as.numeric(validateY), as.numeric(pred), quiet=TRUE)$auc
     
   }
-  print(paste0("Alpha Value:", alpha))
-  print(paste0("Accuracy:", aggr_acc / 10))
-  print(paste0("Area Under ROC:", aggr_roc / 10))
-  print("")
+  
+  metrics[index, ] <- c(alpha, aggr_acc / 10, aggr_roc / 10)
+  index <- index + 1
 }
+
+print(metrics)
 ```
 
 Predict on Test Values
@@ -72,17 +82,17 @@ testX <- test
 testX$genre <- NULL
 
 model <- naiveBayes(trainX, trainY, laplace=1000)
-pred <- predict(model, testX)
+pred <- predict(model, testX, type="class")
 
-conf_matrix <- table(pred, testY)
-print(conf_matrix)
-print(paste0("ACC:",sum(diag(conf_matrix))/sum(conf_matrix)))
-print(paste0("ROC:", multiclass.roc(as.numeric(testY), as.numeric(pred), quiet=TRUE)$auc))
+predictive_values(testY, pred)
 ```
 
 
-Plot ROC Curve with manual model analysis
+Plot ROC Curve with selected model
 ```{r}
+source("rocCurve.R")
 
+predProb <- predict(model, testX, type="class")
+make_roc(predProb, testY, "Naive Bayes")
 ```
 
