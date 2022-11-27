@@ -89,21 +89,23 @@ write.csv(test, "./test.csv", row.names = TRUE)
 
 # Decision Tree
 ```{r}
-library(rpart)
-library(partykit)
-library(rpart.plot)
-decisionTree <- rpart(genre ~ ., data = train , method = "class")
-summary(decisionTree)
+# Predictions for train
+decisionTree <- rpart(genre ~ ., data = train , method = "class" )
+#summary(decisionTree)
 prp(decisionTree, type=1, extra=1)
 plot(decisionTree)
 text(decisionTree, cex = 0.3, use.n=TRUE)
 plot(as.party(decisionTree))
-
-# Predictions
 vpred <- predict(decisionTree, type = "class")
-#matrix
 tab <- table(pred = vpred, actual = train$genre) 
 tab
 accuracy <- sum(diag(tab))/sum(tab)
-cat("Accuracy:", accuracy) #0.3338327
+cat("Accuracy for train data:", accuracy) #0.3338327
+
+# Predictions for test
+vpred <- predict(decisionTree, data = test, type = "class")
+tab <- table(pred = vpred, actual = test$genre) 
+tab
+accuracy <- sum(diag(tab))/sum(tab)
+cat("Accuracy for test data:", accuracy) #0.3430837
 ```
