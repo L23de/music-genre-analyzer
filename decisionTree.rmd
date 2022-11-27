@@ -89,48 +89,23 @@ write.csv(test, "./test.csv", row.names = TRUE)
 
 # Decision Tree
 ```{r}
-library(rpart)
-library(partykit)
+# Predictions for train
 decisionTree <- rpart(genre ~ ., data = train , method = "class" )
-summary(decisionTree)
-#plot(decisionTree)
+#summary(decisionTree)
+prp(decisionTree, type=1, extra=1)
+plot(decisionTree)
+text(decisionTree, cex = 0.3, use.n=TRUE)
 plot(as.party(decisionTree))
-
-# Predictions
 vpred <- predict(decisionTree, type = "class")
-#matrix
 tab <- table(pred = vpred, actual = train$genre) 
 tab
 accuracy <- sum(diag(tab))/sum(tab)
-cat("Accuracy:", accuracy)
-```
+cat("Accuracy for train data:", accuracy) #0.3338327
 
-# C50 Decision Tree
-```{r}
-#prediction
-library(C50)
-train$genre <- as.factor(train$genre)
-treeModel <- C5.0(x = train[-c(2)], y = train$genre)
-summary(treeModel)
-plot(treeModel)
-ruleModel <- C5.0(genre ~ ., data = train, rules = TRUE)
-```
-
-```{r}
-library(C50)
-#training for creating model
-#training$p.2
-train$genre <- NULL 
-modelC5 <- C5.0( x = train[], as.factor(train$genre), method = "class") 
-# x = all attributes, y = factor of what you want to predict
-train$genre <- as.factor(train$genre)
-#modelC5 <- C5.0( p~., data = training, rules = TRUE, method = "class")
-summary(modelC5)
-plot(modelC5)
-#testing data with the trained data create
-vpred <- predict(modelC5, test, type="class")
-tabC5 <- table(data.frame(test$genre, pred = vpred))
-tabC5
-accuracyC5 <- sum(diag(tab))/sum(tab)
-accuracyC5
+# Predictions for test
+vpred <- predict(decisionTree, data = test, type = "class")
+tab <- table(pred = vpred, actual = test$genre) 
+tab
+accuracy <- sum(diag(tab))/sum(tab)
+cat("Accuracy for test data:", accuracy) #0.3430837
 ```
