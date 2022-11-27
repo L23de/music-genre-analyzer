@@ -39,7 +39,7 @@ predictive_values <- function(actual_val, predicted, verbose=FALSE){
     # Calculate precision, recall
     precision <- TP / (TP + FP)
     recall <- TP / (TP + FN)
-    acc <- (TP + TN) + (TP + TN + FP + FN)
+    acc <- (TP + TN) / (TP + TN + FP + FN)
 
     # Print those values if verbose
     if (verbose){
@@ -58,7 +58,7 @@ predictive_values <- function(actual_val, predicted, verbose=FALSE){
   avg_acc <- total_acc / class_len
   
   # Print out results
-  print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Accuracy:", avg_acc,"\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
+  print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Accuracy:", avg_acc, "\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
 }
 
 # predictive_values(c(1,2,3,4), c(1,2,3,4), verbose=FALSE)
