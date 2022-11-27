@@ -8,6 +8,8 @@ output: html_notebook
 ```{r}
 library(e1071)
 library(pROC)
+library(multiROC)
+library(ggplot2)
 ```
 
 
@@ -92,7 +94,7 @@ Plot ROC Curve with selected model
 ```{r}
 source("rocCurve.R")
 
-predProb <- predict(model, testX, type="class")
-make_roc(predProb, testY, "Naive Bayes")
+predProb <- predict(model, testX, type="raw")
+make_roc(predProb, test, "Naive Bayes")
 ```
 

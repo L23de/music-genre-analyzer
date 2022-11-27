@@ -24,6 +24,7 @@ library(caret)
 
 ```{r}
 music <- read.csv("music_data.csv", header=TRUE)
+set.seed(42)
 ```
 
 # Data Cleaning
