@@ -9,11 +9,14 @@ library(rpart.plot)
 library(partykit)
 ```
 
-Get the data from the CSVs
+# Save to file
 ```{r}
 # Read from CSVs
 train = read.csv("./train.csv", header=TRUE) 
 test = read.csv("./test.csv", header=TRUE)
+
+train$X <- NULL
+test$X <- NULL
 ```
 
 # Decision Tree
@@ -25,21 +28,15 @@ prp(decisionTree, type=1, extra=1)
 plot(decisionTree)
 text(decisionTree, cex = 0.3, use.n=TRUE)
 plot(as.party(decisionTree))
+
+# Predictions for test
 vpred <- predict(decisionTree)
 tab <- table(pred = vpred, actual = train$genre) 
 accuracy <- sum(diag(tab))/sum(tab)
 cat("Accuracy for train data:", accuracy)
-
-# Predictions for test
-vpred2 <- predict(decisionTree, test)
-tab <- table(vpred2, test$genre) 
-tab
-accuracy <- sum(diag(tab))/sum(tab)
-cat("Accuracy for test data:", accuracy)
 ```
 
 ```{r}
-
 # Make function
 predictive_values <- function(actual_val, predicted, verbose){
   # Get classes from values
@@ -99,5 +96,5 @@ predictive_values <- function(actual_val, predicted, verbose){
   print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
 }
 
-predictive_values(test$genre, vpred2, verbose=FALSE)
+predictive_values(test$genre, vpred, verbose=FALSE)
 ```

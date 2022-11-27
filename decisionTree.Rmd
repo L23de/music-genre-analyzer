@@ -14,6 +14,9 @@ Get the data from the CSVs
 # Read from CSVs
 train = read.csv("./train.csv", header=TRUE) 
 test = read.csv("./test.csv", header=TRUE)
+
+train$X <- null
+test$X <- null
 ```
 
 # Decision Tree
@@ -33,7 +36,6 @@ cat("Accuracy for train data:", accuracy)
 # Predictions for test
 vpred2 <- predict(decisionTree, test)
 tab <- table(vpred2, test$genre) 
-tab
 accuracy <- sum(diag(tab))/sum(tab)
 cat("Accuracy for test data:", accuracy)
 ```
