@@ -25,100 +25,13 @@ featureImportance <- varImp(multi_log_model)
 Plot ROC Curve
 ```{r}
 require(multiROC)
-
-make_roc <- function(class_prob_predictions, test_df, model_name){
-  # convert the predictions to a data frame
-  predictions_prob <- data.frame(class_prob_predictions)
-  
-  # Make a data frame out of the genre
-  true_label <- data.frame(test_df$genre == 1, test_df$genre == 2, test_df$genre == 3, test_df$genre == 4, test_df$genre == 5, test_df$genre == 6, test_df$genre == 7)
-  
-  # Hack to transform FALSE to 0 and TRUE to 1
-  true_label <- true_label * 1
-  
-  # Merge the two dataframes
-  merged <- cbind(true_label, predictions_prob)
-  
-  # Give them the correct column names
-  colnames(merged) <- c("S1_true", "S2_true", "S3_true", "S4_true", "S5_true", "S6_true", "S7_true", "S1_pred_log", "S2_pred_log", "S3_pred_log", "S4_pred_log", "S5_pred_log", "S6_pred_log", "S7_pred_log")
-  
-  # Do the multi roc analysis
-  roc_res <- multi_roc(merged, force_diag=T)
-  plot_roc_df <- plot_roc_data(roc_res)
-
-  # Print AUC values
-  print("AUC Values")
-  print(unlist(roc_res$AUC))
-  print("Average AUC Values")
-  print(mean(as.vector(unlist(roc_res$AUC))))
-
-  # Graph everything
-  ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) + ggtitle(model_name)  + geom_path(aes(color = Group, linetype=Method)) + geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour='grey', linetype = 'dotdash') + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
-}
-
+source("rocCurve.R")
 make_roc(predictions_prob, test, "Logistic Regression Model")
 ```
 
 Generate predicitve values
 ```{r}
 # Make function
-predictive_values <- function(actual_val, predicted, verbose=FALSE){
-  # Get classes from values
-  options <- sort(unique(actual_val))
-  
-  # Get length of those values
-  class_len <- length(options)
-  
-  # Print those numbers out if verbose
-  if (verbose){
-    print(options)
-    print(class_len)
-  }
-  
-  # Totals are 0
-  total_recall = 0
-  total_precision = 0
-  
-  # Iterate through the different classes
-  for(val in options){
-    # Convert vectors into predictions and actual values for just one class
-    pred <- predicted == val
-    actual <- actual_val == val
-    
-    # Make and print the confusion matrix, if verbose
-    confusion_matrix <- table(actual, pred)
-    if (verbose){
-      print(confusion_matrix)
-    }
-  
-    # Convert confusion matrix into predictive values
-    confusion_vec <- as.vector(confusion_matrix)
-    TN <- confusion_vec[1]
-    FN <- confusion_vec[2]
-    FP <- confusion_vec[3]
-    TP <- confusion_vec[4]
-    
-    # Calculate precision, recall
-    precision <- TP / (TP + FP)
-    recall <- TP / (TP + FN)
-
-    # Print those values if verbose
-    if (verbose){
-        print(paste(c("Genre #: ",val, "Precision:", precision, "Recall:", recall)))
-    }
-
-    # Add to the total
-    total_precision <- total_precision + precision
-    total_recall <- total_recall + recall
-  }
-  
-  # Calculate averages
-  avg_recall <- total_recall / class_len
-  avg_precision <- total_precision / class_len
-  
-  # Print out results
-  print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
-}
-
+source("classPredictions.R")
 predictive_values(test$genre, predictions, verbose=FALSE)
 ```
