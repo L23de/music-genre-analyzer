@@ -2,6 +2,9 @@ Load the data
 ```{r}
 train = read.csv("./train.csv", header=TRUE)
 test = read.csv("./test.csv", header=TRUE)
+
+train$X <- NULL
+test$X <- NULL
 ```
 
 
@@ -16,12 +19,14 @@ predictions_prob <- predict(multi_log_model, test, type="prob")
 acc <- sum(predictions == test$genre) / length(test$genre)
 print(acc)
 
-varImp(multi_log_model)
+featureImportance <- varImp(multi_log_model)
 ```
 
 Plot ROC Curve
 ```{r}
-make_roc <- function(class_prob_predictions, test_df){
+require(multiROC)
+
+make_roc <- function(class_prob_predictions, test_df, model_name){
   # convert the predictions to a data frame
   predictions_prob <- data.frame(class_prob_predictions)
   
@@ -48,10 +53,10 @@ make_roc <- function(class_prob_predictions, test_df){
   print(mean(as.vector(unlist(roc_res$AUC))))
 
   # Graph everything
-  ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) + geom_path(aes(color = Group, linetype=Method)) + geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour='grey', linetype = 'dotdash') + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
+  ggplot(plot_roc_df, aes(x = 1-Specificity, y=Sensitivity)) + ggtitle(model_name)  + geom_path(aes(color = Group, linetype=Method)) + geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), colour='grey', linetype = 'dotdash') + theme_bw() + theme(plot.title = element_text(hjust = 0.5), legend.justification=c(1, 0), legend.position=c(.95, .05), legend.title=element_blank(), legend.background = element_rect(fill=NULL, size=0.5, linetype="solid", colour ="black"))
 }
 
-make_roc(predictions_prob, test)
+make_roc(predictions_prob, test, "Logistic Regression Model")
 ```
 
 Generate predicitve values
