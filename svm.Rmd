@@ -7,7 +7,7 @@ test$X <- NULL
 ```
 
 
-Create the SVM model in a function 
+Create the SVM models with different kernels
 ```{r}
 library(e1071)
 # Make svm model with different kernel
@@ -17,8 +17,7 @@ svm_model_sig <- svm(formula=as.factor(genre)~., kernel="sigmoid", data=train, t
 svm_model_poly <- svm(formula=as.factor(genre)~., kernel="polynomial", data=train, type="C-classification")
 ```
 
-
-Ten Fold Cross Validation
+Calculating Accuracy
 ```{r}
 # Calculate accuracies
 # linear
@@ -47,8 +46,9 @@ total = length(class_predictions_poly)
 print(paste("Accuracy: ", correct / total)) # 0.683700440528634
 ```
 
+Calculating predictive values
 ```{r}
-# source("classPredictions.R")
+source("classPredictions.R")
 predictive_values(class_predictions_linear, test$genre, verbose = FALSE)
 predictive_values(class_predictions_radial, test$genre, verbose = FALSE)
 predictive_values(class_predictions_sigmoid, test$genre, verbose = FALSE)
@@ -56,8 +56,7 @@ predictive_values(class_predictions_poly, test$genre, verbose = FALSE)
 
 ```
 
-# ROC curve
-
+ROC curve
 ```{r}
 # install.packages('multiROC')
 require(multiROC)
