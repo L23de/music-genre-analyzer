@@ -12,10 +12,9 @@ Create the SVM model in a function
 library(e1071)
 # Make svm model with different kernel
 svm_model_lin <- svm(formula=as.factor(genre)~., kernel="linear", data=train, type="C-classification")
-svm_model_lin_prob <- svm(formula=as.factor(genre)~., kernel="linear", data=train, probability = TRUE)
-# svm_model_rad <- svm(formula=as.factor(genre)~., kernel="radial", data=train, type="C-classification")
-# svm_model_sig <- svm(formula=as.factor(genre)~., kernel="sigmoid", data=train, type="C-classification")
-# svm_model_poly <- svm(formula=as.factor(genre)~., kernel="polynomial", data=train, type="C-classification")
+svm_model_rad <- svm(formula=as.factor(genre)~., kernel="radial", data=train, type="C-classification")
+svm_model_sig <- svm(formula=as.factor(genre)~., kernel="sigmoid", data=train, type="C-classification")
+svm_model_poly <- svm(formula=as.factor(genre)~., kernel="polynomial", data=train, type="C-classification")
 ```
 
 
@@ -25,45 +24,48 @@ Ten Fold Cross Validation
 # linear
 class_predictions_linear <- predict(svm_model_lin, test, type="response")
 predictions_prob <- predict(svm_model_lin_prob, test, probability = TRUE)
-correct = sum(class_predictions == train$genre) 
-total = length(class_predictions)
+correct = sum(class_predictions_linear == test$genre) 
+total = length(class_predictions_linear)
 print(paste("Accuracy: ", correct / total)) # 0.683700440528634
 
 # radial
 class_predictions_radial <- predict(svm_model_rad, test, type="response")
-correct = sum(class_predictions == train$genre)
-total = length(class_predictions)
+correct = sum(class_predictions_radial == test$genre)
+total = length(class_predictions_radial)
 print(paste("Accuracy: ", correct / total)) # 0.683700440528634
 
 # sigmoid
 class_predictions_sigmoid <- predict(svm_model_sig, test, type="response")
-correct = sum(class_predictions == train$genre)
-total = length(class_predictions)
+correct = sum(class_predictions_sigmoid == test$genre)
+total = length(class_predictions_sigmoid)
 print(paste("Accuracy: ", correct / total)) # 0.683700440528634
 
 # poly
 class_predictions_poly <- predict(svm_model_poly, test, type="response")
-correct = sum(class_predictions == train$genre)
-total = length(class_predictions)
+correct = sum(class_predictions_poly == test$genre)
+total = length(class_predictions_poly)
 print(paste("Accuracy: ", correct / total)) # 0.683700440528634
 ```
 
 ```{r}
-source("classPredictions.R")
-predictive_values(c(class_predictions_linear, class_predictions_radial, class_predictions_sigmoid, class_predictions_poly), c(test$genre, test$genre, test$genre, test$genre), verbose = FALSE)
+# source("classPredictions.R")
+predictive_values(class_predictions_linear, test$genre, verbose = FALSE)
+predictive_values(class_predictions_radial, test$genre, verbose = FALSE)
+predictive_values(class_predictions_sigmoid, test$genre, verbose = FALSE)
+predictive_values(class_predictions_poly, test$genre, verbose = FALSE)
+
 ```
 
 # ROC curve
 
 ```{r}
-# Source of the code : https://github.com/WandeRum/multiROC
 # install.packages('multiROC')
 require(multiROC)
+library(ggplot2)
 # The function
 source("rocCurve.R")
-# svm_model_lin_prob <- svm(formula=as.factor(genre)~., kernel="linear", data=train, probability=TRUE)
-prob_predictions_linear <- predict(svm_model_lin_prob, test, probability=TRUE)
-attr(prob_predictions_linear, "probabilities")
-
+# Making roc curve for radial because it performed the best in accuracy, precision, recall
+svm_model_rad_prob <- svm(formula=as.factor(genre)~., kernel="radial", data=train, probability = TRUE)
+prob_predictions_linear <- predict(svm_model_rad_prob, test, probability=TRUE)
 make_roc(attr(prob_predictions_linear, "probabilities"), test, "Support Vector Machine")
 ```
