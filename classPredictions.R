@@ -15,7 +15,6 @@ predictive_values <- function(actual_val, predicted, verbose=FALSE){
   # Totals are 0
   total_recall = 0
   total_precision = 0
-  total_acc = 0
   
   # Iterate through the different classes
   for(val in options){
@@ -49,16 +48,14 @@ predictive_values <- function(actual_val, predicted, verbose=FALSE){
     # Add to the total
     total_precision <- total_precision + precision
     total_recall <- total_recall + recall
-    total_acc <- total_acc + acc
   }
   
   # Calculate averages
   avg_recall <- total_recall / class_len
   avg_precision <- total_precision / class_len
-  avg_acc <- total_acc / class_len
   
   # Print out results
-  print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Accuracy:", avg_acc, "\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
+  print(paste(c(cat("Total Over", class_len, "Genres ==>\n"), cat("Avg Precision:", avg_precision, "\n"), cat("Avg Recall:", avg_recall, "\n"))))
 }
 
-# predictive_values(c(1,2,3,4), c(1,2,3,4), verbose=FALSE)
+predictive_values(c(1,2,3,4), c(1,2,3,4), verbose=FALSE)
