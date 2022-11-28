@@ -7,10 +7,9 @@ output: html_notebook
 
 # Install dependencies
 ```{r}
-install.packages()
 install.packages("caret")
+install.packages("GGally")
 ```
-
 
 
 # Load libraries
@@ -18,6 +17,8 @@ install.packages("caret")
 ```{r}
 library(ggplot2)
 library(caret)
+library(reshape2)
+library(GGally)
 ```
 
 # Load in CSV
@@ -62,21 +63,49 @@ for(i in 1:ncol(music)){
 unique(music$genre)
 music$genre <- as.numeric(factor(music$genre))
 
+# Bucket the years
+music$release_date <- floor((music$release_date - 1950) / 10)
+```
+
+# One-Hot Encode
+```{r}
 # One Hot Encode Topic
 unique(music$topic)
-music$topicIsSad <- music$topic == "sadness"
-music$topicIsLife <- music$topic == "world/life"
-music$topicIsMusic <- music$topic == "music"
-music$topicIsRomance <- music$topic == "romantic"
-music$topicIsViolence <- music$topic == "violence"
-music$topicIsObscence <- music$topic == "obscene"
-music$topicIsNight <- music$topic == "night/time"
-music$topicIsFeeling <- music$topic == "feelings"
+music$topicIsSad <- (music$topic == "sadness") * 1
+music$topicIsLife <- (music$topic == "world/life") * 1
+music$topicIsMusic <- (music$topic == "music") * 1
+music$topicIsRomance <- (music$topic == "romantic") * 1
+music$topicIsViolence <- (music$topic == "violence") * 1
+music$topicIsObscence <- (music$topic == "obscene") * 1
+music$topicIsNight <- (music$topic == "night/time") * 1
+music$topicIsFeeling <- (music$topic == "feelings") * 1
 
 music$topic <- NULL
+```
 
-# Bucket the years
-music$release_date <- as.factor(floor((music$release_date - 1950) / 10))
+# Data Visualizations
+```{r}
+# Correlation Heatmap
+# Source: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization
+cormat <- cor(music)
+# Reorder cormat by correlation
+reorder_cormat <- function(cormat){
+# Use correlation between variables as distance
+  dd <- as.dist((1-cormat)/2)
+  hc <- hclust(dd)
+  cormat <-cormat[hc$order, hc$order]
+}
+cormat <- reorder_cormat(cormat)
+
+# Converts df to two-col table
+cormat <- melt(cormat, na.rm=TRUE)
+
+# Plot correlaton matrix
+par(mar = c(0.1, 0.1, 0.1, 0.1))
+ggplot(cormat, aes(x=Var1, y=Var2, fill=value)) + geom_tile(color="white") + scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") + theme_minimal() + theme(axis.text.y=element_text(size=8), axis.text.x = element_text(angle = 90, 
+    size = 8, vjust=1))
 ```
 
 # Train-test Split
@@ -94,6 +123,7 @@ split_prop = round(0.8 * nrow(music))
 train = music[1:(split_prop-1),]
 test = music[split_prop:nrow(music),]
 ```
+
 
 # Save to file
 

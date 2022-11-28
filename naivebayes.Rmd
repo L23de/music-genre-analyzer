@@ -64,8 +64,8 @@ for (alpha in c(0.1, 1, 10, 100, 1000, 10000)) {
     acc <- sum(diag(conf_matrix))/sum(conf_matrix)
     roc <- multiclass.roc(as.numeric(validateY), as.numeric(pred), quiet=TRUE)$auc
     
-    aggr_acc <- aggr_acc + sum(diag(conf_matrix))/sum(conf_matrix)
-    aggr_roc <- aggr_roc + multiclass.roc(as.numeric(validateY), as.numeric(pred), quiet=TRUE)$auc
+    aggr_acc <- aggr_acc + acc
+    aggr_roc <- aggr_roc + roc
     
   }
   
@@ -78,15 +78,18 @@ print(metrics)
 
 Predict on Test Values
 ```{r}
-# Select model with alpha = 1000, produced best results in training
+# Select model with alpha = 1000, produced best results in trainSing
 testY <- test$genre
 testX <- test
 testX$genre <- NULL
 
 model <- naiveBayes(trainX, trainY, laplace=1000)
 pred <- predict(model, testX, type="class")
+conf_matrix <- table(testY, pred)
 
+print(paste0("Accuracy: ", acc <- sum(diag(conf_matrix)) / sum(conf_matrix)))
 predictive_values(testY, pred)
+
 ```
 
 
@@ -97,4 +100,3 @@ source("rocCurve.R")
 predProb <- predict(model, testX, type="raw")
 make_roc(predProb, test, "Naive Bayes")
 ```
-
